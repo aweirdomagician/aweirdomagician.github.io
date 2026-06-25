@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Crimson Vault — Resource Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ─── THEME TOKENS ─── */
+:root {
+  --crimson: #8b0000;
+  --crimson-bright: #cc0000;
+  --crimson-glow: #e02020;
+  --bone: #f5f0f0;
+  --parchment: #ede5d8;
+  --ash: #2a2a2a;
+  --void: #0a0a0a;
+  --shadow: #1a0000;
+  --mist: #c0b8b0;
+  --border: rgba(139,0,0,0.35);
+  --radius: 4px;
+}
+[data-theme="dark"] {
+  --bg-primary: var(--void);
+  --bg-secondary: #100000;
+  --bg-card: #140505;
+  --bg-card-hover: #1c0808;
+  --text-primary: var(--bone);
+  --text-secondary: var(--mist);
+  --text-accent: #e88080;
+  --nav-bg: rgba(10,0,0,0.95);
+  --divider: rgba(139,0,0,0.4);
+  --input-bg: #1a0505;
+  --input-border: rgba(139,0,0,0.5);
+  --tag-bg: rgba(139,0,0,0.25);
+  --tag-text: #e88080;
+  --hero-overlay: rgba(10,0,0,0.75);
+  --footer-bg: #080000;
+  --scroll-thumb: #8b0000;
+  --icon-bg: rgba(139,0,0,0.2);
+}
+[data-theme="light"] {
+  --bg-primary: #fdf6f0;
+  --bg-secondary: #f0e8e0;
+  --bg-card: #fff8f5;
+  --bg-card-hover: #ffe8e0;
+  --text-primary: #1a0000;
+  --text-secondary: #5a3030;
+  --text-accent: #8b0000;
+  --nav-bg: rgba(253,246,240,0.97);
+  --divider: rgba(139,0,0,0.25);
+  --input-bg: #fff8f5;
+  --input-border: rgba(139,0,0,0.4);
+  --tag-bg: rgba(139,0,0,0.12);
+  --tag-text: #8b0000;
+  --hero-overlay: rgba(253,246,240,0.55);
+  --footer-bg: #1a0000;
+  --scroll-thumb: #cc0000;
+  --icon-bg: rgba(139,0,0,0.12);
+}
+
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'EB Garamond', Georgia, serif;
+  font-size: 17px;
+  line-height: 1.7;
+  transition: background 0.3s, color 0.3s;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 3px; }
+
+/* ─── TYPOGRAPHY ─── */
+h1,h2,h3,h4,h5 { font-family: 'Cinzel', serif; font-weight: 700; letter-spacing: 0.04em; line-height: 1.25; }
+
+/* ─── NAV ─── */
+nav {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--nav-bg);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+  backdrop-filter: blur(12px);
+}
+.nav-brand {
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'Cinzel', serif; font-size: 1.15rem; font-weight: 700;
+  color: var(--crimson-bright); letter-spacing: 0.08em; text-decoration: none;
+}
+.nav-brand .sigil { font-size: 1.5rem; color: var(--crimson-bright); }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a {
+  font-family: 'Cinzel', serif; font-size: 0.75rem; font-weight: 600;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--text-secondary); text-decoration: none;
+  transition: color 0.2s; padding: 4px 0;
+  border-bottom: 1px solid transparent;
+}
+.nav-links a:hover { color: var(--crimson-bright); border-bottom-color: var(--crimson-bright); }
+.nav-right { display: flex; align-items: center; gap: 1rem; }
+.theme-toggle {
+  background: var(--icon-bg); border: 1px solid var(--border);
+  color: var(--text-secondary); cursor: pointer; border-radius: 20px;
+  padding: 6px 14px; font-size: 0.85rem; font-family: 'Cinzel', serif;
+  letter-spacing: 0.06em; transition: all 0.2s;
+  display: flex; align-items: center; gap: 6px;
+}
+.theme-toggle:hover { background: var(--crimson); color: var(--bone); border-color: var(--crimson); }
+.theme-icon { font-size: 1rem; }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative; overflow: hidden;
+  min-height: 420px;
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+}
+.hero-bg {
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse 60% 50% at 50% 0%, rgba(139,0,0,0.18) 0%, transparent 70%),
+    repeating-linear-gradient(
+      0deg, transparent, transparent 39px,
+      rgba(139,0,0,0.05) 39px, rgba(139,0,0,0.05) 40px
+    ),
+    repeating-linear-gradient(
+      90deg, transparent, transparent 39px,
+      rgba(139,0,0,0.04) 39px, rgba(139,0,0,0.04) 40px
+    );
+}
+.hero-content { position: relative; z-index: 1; padding: 4rem 2rem; max-width: 800px; }
+.hero-eyebrow {
+  font-family: 'Courier Prime', monospace; font-size: 0.75rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--crimson-bright); margin-bottom: 1.25rem;
+  display: flex; align-items: center; justify-content: center; gap: 12px;
+}
+.hero-eyebrow::before, .hero-eyebrow::after {
+  content: ''; display: block; width: 40px; height: 1px; background: var(--crimson-bright);
+}
+.hero h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); color: var(--text-primary); margin-bottom: 1rem; }
+.hero h1 span { color: var(--crimson-bright); }
+.hero-sub { color: var(--text-secondary); font-size: 1.1rem; font-style: italic; margin-bottom: 2rem; max-width: 540px; margin-left: auto; margin-right: auto; }
+.hero-search {
+  display: flex; max-width: 520px; margin: 0 auto;
+  border: 1px solid var(--input-border); border-radius: var(--radius);
+  overflow: hidden; background: var(--input-bg);
+}
+.hero-search input {
+  flex: 1; padding: 12px 18px;
+  background: transparent; border: none; outline: none;
+  color: var(--text-primary); font-family: 'EB Garamond', serif; font-size: 1rem;
+}
+.hero-search input::placeholder { color: var(--text-secondary); opacity: 0.7; }
+.hero-search button {
+  padding: 12px 22px; background: var(--crimson); border: none; cursor: pointer;
+  color: var(--bone); font-family: 'Cinzel', serif; font-size: 0.75rem;
+  letter-spacing: 0.1em; transition: background 0.2s;
+}
+.hero-search button:hover { background: var(--crimson-bright); }
+
+/* ─── DRIP DIVIDER ─── */
+.drip-divider {
+  position: relative; height: 28px; overflow: visible;
+  display: flex; align-items: flex-start; justify-content: center;
+  pointer-events: none; margin: 0;
+}
+.drip-divider svg { display: block; width: 100%; }
+
+/* ─── STATS BAR ─── */
+.stats-bar {
+  background: var(--bg-secondary); border-bottom: 1px solid var(--border);
+  padding: 1.2rem 2rem;
+  display: flex; align-items: center; justify-content: center; gap: 3rem;
+  flex-wrap: wrap;
+}
+.stat-item { text-align: center; }
+.stat-number { font-family: 'Cinzel', serif; font-size: 1.5rem; font-weight: 700; color: var(--crimson-bright); }
+.stat-label { font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-secondary); font-family: 'Courier Prime', monospace; }
+.stat-sep { color: var(--border); font-size: 1.5rem; }
+
+/* ─── MAIN LAYOUT ─── */
+.main-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+/* ─── SECTION HEADER ─── */
+.section-header { padding: 3.5rem 0 2rem; text-align: center; }
+.section-eyebrow {
+  font-family: 'Courier Prime', monospace; font-size: 0.7rem;
+  letter-spacing: 0.3em; text-transform: uppercase;
+  color: var(--crimson-bright); margin-bottom: 0.75rem;
+}
+.section-header h2 { font-size: 1.9rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+.section-header p { color: var(--text-secondary); font-style: italic; }
+.ornament { color: var(--crimson-bright); font-size: 1.4rem; margin: 0 12px; }
+
+/* ─── CATEGORY GRID ─── */
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1px; border: 1px solid var(--border);
+  border-radius: var(--radius); overflow: hidden; margin-bottom: 3rem;
+}
+.cat-card {
+  background: var(--bg-card);
+  padding: 1.5rem 1.25rem;
+  cursor: pointer; transition: background 0.2s;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; align-items: center; text-align: center;
+  gap: 10px;
+}
+.cat-card:last-child { border-right: none; }
+.cat-card:hover { background: var(--bg-card-hover); }
+.cat-card.active { background: var(--bg-card-hover); border-bottom: 2px solid var(--crimson-bright); }
+.cat-icon { font-size: 1.8rem; line-height: 1; }
+.cat-name { font-family: 'Cinzel', serif; font-size: 0.8rem; font-weight: 600; letter-spacing: 0.08em; color: var(--text-primary); }
+.cat-count { font-family: 'Courier Prime', monospace; font-size: 0.7rem; color: var(--text-secondary); }
+
+/* ─── FILTER BAR ─── */
+.filter-bar {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+.filter-label { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.1em; color: var(--text-secondary); text-transform: uppercase; }
+.filter-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag {
+  padding: 4px 12px; border-radius: 2px;
+  background: var(--tag-bg); color: var(--tag-text);
+  font-family: 'Courier Prime', monospace; font-size: 0.75rem;
+  border: 1px solid rgba(139,0,0,0.2); cursor: pointer; transition: all 0.2s;
+}
+.tag:hover, .tag.active { background: var(--crimson); color: var(--bone); border-color: var(--crimson); }
+.filter-right { margin-left: auto; }
+.sort-select {
+  background: var(--input-bg); border: 1px solid var(--input-border);
+  color: var(--text-secondary); padding: 6px 12px; border-radius: var(--radius);
+  font-family: 'Courier Prime', monospace; font-size: 0.8rem; cursor: pointer;
+  outline: none;
+}
+
+/* ─── RESOURCE GRID ─── */
+.resource-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.25rem; margin-bottom: 3rem;
+}
+.res-card {
+  background: var(--bg-card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 1.5rem;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+  display: flex; flex-direction: column; gap: 10px;
+  cursor: pointer; position: relative; overflow: hidden;
+}
+.res-card::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--crimson); opacity: 0; transition: opacity 0.2s;
+}
+.res-card:hover { background: var(--bg-card-hover); border-color: rgba(139,0,0,0.6); transform: translateY(-2px); }
+.res-card:hover::before { opacity: 1; }
+.res-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.res-icon-wrap {
+  width: 40px; height: 40px; border-radius: var(--radius);
+  background: var(--icon-bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0;
+}
+.res-title { font-family: 'Cinzel', serif; font-size: 0.95rem; font-weight: 600; color: var(--text-primary); line-height: 1.3; }
+.res-badge {
+  font-family: 'Courier Prime', monospace; font-size: 0.65rem;
+  padding: 2px 8px; border-radius: 2px; white-space: nowrap; flex-shrink: 0;
+  background: var(--tag-bg); color: var(--tag-text); border: 1px solid rgba(139,0,0,0.2);
+}
+.res-badge.free { background: rgba(0,100,0,0.15); color: #5aaa5a; border-color: rgba(0,100,0,0.25); }
+.res-badge.paid { background: rgba(139,0,0,0.15); color: #e08080; border-color: rgba(139,0,0,0.25); }
+.res-badge.new { background: rgba(180,120,0,0.15); color: #ddaa44; border-color: rgba(180,120,0,0.25); }
+.res-desc { font-size: 0.92rem; color: var(--text-secondary); line-height: 1.55; font-style: italic; }
+.res-footer { display: flex; align-items: center; justify-content: space-between; margin-top: auto; padding-top: 10px; border-top: 1px solid var(--divider); }
+.res-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.res-tag { font-family: 'Courier Prime', monospace; font-size: 0.65rem; color: var(--text-secondary); }
+.res-link {
+  font-family: 'Cinzel', serif; font-size: 0.7rem; letter-spacing: 0.1em;
+  color: var(--crimson-bright); text-decoration: none; border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.res-link:hover { border-bottom-color: var(--crimson-bright); }
+
+/* ─── FEATURED SECTION ─── */
+.featured-strip {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 2rem; margin-bottom: 2.5rem;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+}
+@media (max-width: 700px) { .featured-strip { grid-template-columns: 1fr; } }
+.featured-label { font-family: 'Courier Prime', monospace; font-size: 0.65rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--crimson-bright); margin-bottom: 0.75rem; }
+.featured-title { font-family: 'Cinzel', serif; font-size: 1.35rem; color: var(--text-primary); margin-bottom: 0.5rem; }
+.featured-desc { color: var(--text-secondary); font-size: 0.95rem; font-style: italic; margin-bottom: 1.25rem; }
+.btn-crimson {
+  display: inline-block; padding: 9px 22px;
+  background: var(--crimson); color: var(--bone);
+  font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.1em;
+  text-decoration: none; border: 1px solid var(--crimson);
+  transition: background 0.2s; cursor: pointer; border-radius: var(--radius);
+}
+.btn-crimson:hover { background: var(--crimson-bright); border-color: var(--crimson-bright); }
+.btn-ghost {
+  display: inline-block; padding: 9px 22px;
+  background: transparent; color: var(--crimson-bright);
+  font-family: 'Cinzel', serif; font-size: 0.78rem; letter-spacing: 0.1em;
+  text-decoration: none; border: 1px solid rgba(139,0,0,0.4);
+  transition: all 0.2s; cursor: pointer; border-radius: var(--radius);
+}
+.btn-ghost:hover { background: var(--icon-bg); border-color: var(--crimson-bright); }
+.featured-right { border-left: 1px solid var(--border); padding-left: 2rem; }
+
+/* ─── NEWSLETTER ─── */
+.newsletter-section {
+  background: var(--bg-secondary); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 2.5rem; margin-bottom: 3rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.newsletter-section::before {
+  content: '✦'; position: absolute; font-size: 8rem; opacity: 0.03;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+  color: var(--crimson-bright); pointer-events: none;
+}
+.newsletter-section h3 { font-size: 1.4rem; margin-bottom: 0.5rem; }
+.newsletter-section p { color: var(--text-secondary); font-style: italic; margin-bottom: 1.5rem; }
+.newsletter-form { display: flex; max-width: 440px; margin: 0 auto; gap: 0; }
+.newsletter-form input {
+  flex: 1; padding: 10px 16px;
+  background: var(--input-bg); border: 1px solid var(--input-border);
+  border-right: none; color: var(--text-primary); font-family: 'EB Garamond', serif;
+  font-size: 0.95rem; outline: none; border-radius: var(--radius) 0 0 var(--radius);
+}
+.newsletter-form button {
+  padding: 10px 20px; background: var(--crimson); border: 1px solid var(--crimson);
+  color: var(--bone); font-family: 'Cinzel', serif; font-size: 0.75rem;
+  letter-spacing: 0.1em; cursor: pointer; transition: background 0.2s;
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+.newsletter-form button:hover { background: var(--crimson-bright); }
+
+/* ─── FOOTER ─── */
+footer {
+  background: var(--footer-bg); border-top: 1px solid var(--border);
+  padding: 3rem 2rem 2rem; color: var(--bone);
+}
+.footer-inner { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 2.5rem; }
+@media (max-width: 768px) { .footer-inner { grid-template-columns: 1fr 1fr; } .footer-brand-col { grid-column: 1/-1; } }
+.footer-brand { font-family: 'Cinzel', serif; font-size: 1.1rem; color: var(--crimson-bright); font-weight: 700; margin-bottom: 0.75rem; }
+.footer-tagline { font-style: italic; font-size: 0.9rem; color: rgba(245,240,240,0.5); margin-bottom: 1rem; }
+.footer-col-title { font-family: 'Cinzel', serif; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--crimson-bright); margin-bottom: 1rem; }
+.footer-links { list-style: none; }
+.footer-links li { margin-bottom: 0.5rem; }
+.footer-links a { color: rgba(245,240,240,0.55); font-size: 0.9rem; text-decoration: none; transition: color 0.2s; }
+.footer-links a:hover { color: var(--crimson-bright); }
+.footer-bottom { max-width: 1200px; margin: 2rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(139,0,0,0.2); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+.footer-bottom p { font-family: 'Courier Prime', monospace; font-size: 0.72rem; color: rgba(245,240,240,0.35); }
+
+/* ─── MODAL ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+  z-index: 500; display: none; align-items: center; justify-content: center;
+  padding: 2rem;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--bg-card); border: 1px solid rgba(139,0,0,0.5);
+  border-radius: var(--radius); padding: 2rem; max-width: 560px; width: 100%;
+  position: relative;
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: none; border: none; color: var(--text-secondary);
+  font-size: 1.4rem; cursor: pointer; line-height: 1;
+}
+.modal-close:hover { color: var(--crimson-bright); }
+.modal h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+.modal-meta { display: flex; gap: 10px; margin-bottom: 1rem; flex-wrap: wrap; }
+.modal p { color: var(--text-secondary); font-style: italic; line-height: 1.65; margin-bottom: 1.25rem; }
+.modal-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+/* ─── SECTION DIVIDER LINE ─── */
+.sect-line { border: none; border-top: 1px solid var(--border); margin: 0; }
+
+/* ─── RESPONSIVE NAV ─── */
+@media (max-width: 760px) {
+  .nav-links { display: none; }
+  nav { padding: 0 1rem; }
+  .main-wrapper { padding: 0 1rem; }
+  .hero-content { padding: 2.5rem 1rem; }
+  .stats-bar { gap: 1.5rem; padding: 1rem; }
+  .resource-grid { grid-template-columns: 1fr; }
+  .category-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ─── BACK TO TOP ─── */
+.back-top {
+  position: fixed; bottom: 2rem; right: 2rem;
+  background: var(--crimson); color: var(--bone);
+  border: none; border-radius: 50%; width: 44px; height: 44px;
+  font-size: 1.2rem; cursor: pointer; transition: background 0.2s, opacity 0.3s;
+  opacity: 0; pointer-events: none; z-index: 200;
+  display: flex; align-items: center; justify-content: center;
+}
+.back-top.visible { opacity: 1; pointer-events: auto; }
+.back-top:hover { background: var(--crimson-bright); }
+
+/* HIDE/SHOW RESOURCES */
+.res-card.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- ─── NAV ─── -->
+<nav>
+  <a class="nav-brand" href="#">
+    <span class="sigil">⚔</span>
+    The Crimson Vault
+  </a>
+  <ul class="nav-links">
+    <li><a href="#resources">Resources</a></li>
+    <li><a href="#tools">Tools</a></li>
+    <li><a href="#learning">Learning</a></li>
+    <li><a href="#community">Community</a></li>
+    <li><a href="#about">About</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">
+      <span class="theme-icon" id="themeIcon">☀</span>
+      <span id="themeLabel">Light</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section class="hero" id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">The Crimson Vault</p>
+    <h1>Your <span>Sovereign</span> Resource Hub</h1>
+    <p class="hero-sub">A curated sanctuary of tools, guides, and knowledge — forged for those who demand mastery over the digital realm.</p>
+    <div class="hero-search">
+      <input type="text" id="searchInput" placeholder="Seek within the vault…" oninput="filterResources()">
+      <button onclick="filterResources()">Search</button>
+    </div>
+  </div>
+</section>
+
+<!-- ─── DRIP DIVIDER ─── -->
+<div class="drip-divider">
+  <svg viewBox="0 0 1200 28" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" height="28">
+    <rect x="0" y="0" width="1200" height="3" fill="#8b0000" opacity="0.7"/>
+    <ellipse cx="120" cy="8" rx="4" ry="12" fill="#8b0000" opacity="0.6"/>
+    <ellipse cx="280" cy="12" rx="3" ry="18" fill="#cc0000" opacity="0.5"/>
+    <ellipse cx="430" cy="7" rx="3.5" ry="10" fill="#8b0000" opacity="0.55"/>
+    <ellipse cx="600" cy="14" rx="4.5" ry="20" fill="#cc0000" opacity="0.6"/>
+    <ellipse cx="760" cy="9" rx="3" ry="14" fill="#8b0000" opacity="0.5"/>
+    <ellipse cx="920" cy="11" rx="4" ry="16" fill="#cc0000" opacity="0.55"/>
+    <ellipse cx="1080" cy="7" rx="3.5" ry="11" fill="#8b0000" opacity="0.6"/>
+  </svg>
+</div>
+
+<!-- ─── STATS BAR ─── -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="stat-number">248</div>
+    <div class="stat-label">Resources</div>
+  </div>
+  <div class="stat-sep">✦</div>
+  <div class="stat-item">
+    <div class="stat-number">12</div>
+    <div class="stat-label">Categories</div>
+  </div>
+  <div class="stat-sep">✦</div>
+  <div class="stat-item">
+    <div class="stat-number">64</div>
+    <div class="stat-label">Free Tools</div>
+  </div>
+  <div class="stat-sep">✦</div>
+  <div class="stat-item">
+    <div class="stat-number">9.4k</div>
+    <div class="stat-label">Members</div>
+  </div>
+</div>
+
+<!-- ─── MAIN ─── -->
+<div class="main-wrapper">
+
+  <!-- FEATURED -->
+  <div class="section-header">
+    <p class="section-eyebrow">Featured This Month</p>
+    <h2><span class="ornament">✦</span>Curated Selections<span class="ornament">✦</span></h2>
+    <p>Hand-picked by the Vault Keepers for their exceptional merit</p>
+  </div>
+
+  <div class="featured-strip">
+    <div>
+      <p class="featured-label">⚔ Staff Pick — Design</p>
+      <h3 class="featured-title">The Dark Arts of UX Research</h3>
+      <p class="featured-desc">A comprehensive compendium of user research methods, from shadowing rituals to the arcane craft of card sorting. Master your users' deepest desires before they know them.</p>
+      <a href="#" class="btn-crimson">Enter the Grimoire</a>
+    </div>
+    <div class="featured-right">
+      <p class="featured-label">🔥 Trending — Development</p>
+      <h3 class="featured-title">Sovereign CLI: Terminal Mastery</h3>
+      <p class="featured-desc">Command the black screen with absolute authority. A curated path from novice incantations to scripting sorcery that bends machines to your will.</p>
+      <a href="#" class="btn-ghost">Begin the Rite</a>
+    </div>
+  </div>
+
+  <!-- CATEGORIES -->
+  <hr class="sect-line">
+  <div class="section-header" id="resources">
+    <p class="section-eyebrow">The Archives</p>
+    <h2><span class="ornament">✦</span>Browse by Domain<span class="ornament">✦</span></h2>
+  </div>
+
+  <div class="category-grid" id="catGrid">
+    <div class="cat-card active" onclick="filterByCategory('all', this)">
+      <span class="cat-icon">⚔</span>
+      <span class="cat-name">All</span>
+      <span class="cat-count">248</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('design', this)">
+      <span class="cat-icon">🎨</span>
+      <span class="cat-name">Design</span>
+      <span class="cat-count">48</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('development', this)">
+      <span class="cat-icon">💻</span>
+      <span class="cat-name">Dev</span>
+      <span class="cat-count">72</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('ai', this)">
+      <span class="cat-icon">🤖</span>
+      <span class="cat-name">AI & ML</span>
+      <span class="cat-count">35</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('productivity', this)">
+      <span class="cat-icon">⚡</span>
+      <span class="cat-name">Productivity</span>
+      <span class="cat-count">29</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('security', this)">
+      <span class="cat-icon">🔒</span>
+      <span class="cat-name">Security</span>
+      <span class="cat-count">22</span>
+    </div>
+    <div class="cat-card" onclick="filterByCategory('learning', this)">
+      <span class="cat-icon">📖</span>
+      <span class="cat-name">Learning</span>
+      <span class="cat-count">42</span>
+    </div>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <span class="filter-label">Filter:</span>
+    <div class="filter-tags">
+      <span class="tag active" onclick="toggleTag(this, 'all')">All Types</span>
+      <span class="tag" onclick="toggleTag(this, 'free')">Free</span>
+      <span class="tag" onclick="toggleTag(this, 'paid')">Paid</span>
+      <span class="tag" onclick="toggleTag(this, 'new')">New</span>
+      <span class="tag" onclick="toggleTag(this, 'tutorial')">Tutorial</span>
+      <span class="tag" onclick="toggleTag(this, 'tool')">Tool</span>
+      <span class="tag" onclick="toggleTag(this, 'reference')">Reference</span>
+    </div>
+    <div class="filter-right">
+      <select class="sort-select" onchange="filterResources()">
+        <option value="newest">Newest First</option>
+        <option value="popular">Most Popular</option>
+        <option value="alpha">Alphabetical</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- RESOURCE CARDS -->
+  <div class="resource-grid" id="resourceGrid">
+
+    <div class="res-card" data-cat="design" data-type="tool" data-title="Figma — Collaborative Design" data-url="https://figma.com" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🎨</div>
+        <div class="res-title">Figma — Collaborative Design</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">The reigning monarch of UI design. Collaborate in real time, prototype swiftly, and conjure design systems of impeccable order.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#design</span><span class="res-tag">#ui</span><span class="res-tag">#prototyping</span></div>
+        <a class="res-link" href="https://figma.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="development" data-type="reference" data-title="MDN Web Docs" data-url="https://developer.mozilla.org" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">📜</div>
+        <div class="res-title">MDN Web Docs</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">The ancient tome of web standards. Every HTML element, CSS property, and JavaScript API documented with authoritative precision.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#html</span><span class="res-tag">#css</span><span class="res-tag">#js</span></div>
+        <a class="res-link" href="https://developer.mozilla.org" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="ai" data-type="tool" data-title="Claude — AI Assistant" data-url="https://claude.ai" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🤖</div>
+        <div class="res-title">Claude — AI Assistant</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">Anthropic's sovereign AI: nuanced, thoughtful, and capable. From code generation to complex reasoning, an indispensable companion for dark and brilliant minds.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#ai</span><span class="res-tag">#assistant</span><span class="res-tag">#llm</span></div>
+        <a class="res-link" href="https://claude.ai" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="security" data-type="tool" data-title="Kali Linux — Security Arsenal" data-url="https://kali.org" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🔒</div>
+        <div class="res-title">Kali Linux — Security Arsenal</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">The preferred weapon of penetration testers and security researchers. A battle-hardened Linux distribution brimming with offensive and defensive tools.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#security</span><span class="res-tag">#linux</span><span class="res-tag">#pentest</span></div>
+        <a class="res-link" href="https://kali.org" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="productivity" data-type="tool" data-title="Obsidian — Knowledge Vault" data-url="https://obsidian.md" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">📓</div>
+        <div class="res-title">Obsidian — Knowledge Vault</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">A second brain built upon an interconnected web of markdown. Forge your own personal grimoire with linked notes, graphs, and plugins without end.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#notes</span><span class="res-tag">#pkm</span><span class="res-tag">#markdown</span></div>
+        <a class="res-link" href="https://obsidian.md" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="development" data-type="tool" data-title="GitHub — Code Repository" data-url="https://github.com" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🐙</div>
+        <div class="res-title">GitHub — Code Repository</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">The great citadel of open source. Store, version, and collaborate on code. Where millions of projects are born, maintained, and sometimes abandoned to the void.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#git</span><span class="res-tag">#open-source</span><span class="res-tag">#devops</span></div>
+        <a class="res-link" href="https://github.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="learning" data-type="tutorial" data-title="The Odin Project — Web Dev Path" data-url="https://theodinproject.com" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🌐</div>
+        <div class="res-title">The Odin Project</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">A full-stack web development curriculum forged in the fires of community wisdom. From HTML fundamentals to Node.js mastery — all free, all excellent.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#webdev</span><span class="res-tag">#curriculum</span><span class="res-tag">#fullstack</span></div>
+        <a class="res-link" href="https://theodinproject.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="ai" data-type="reference" data-title="Hugging Face — Model Hub" data-url="https://huggingface.co" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🤗</div>
+        <div class="res-title">Hugging Face — Model Hub</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">The largest open repository of machine learning models, datasets, and spaces. Deploy transformers, run inference, and build AI pipelines without the dark arts of from-scratch training.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#ml</span><span class="res-tag">#transformers</span><span class="res-tag">#nlp</span></div>
+        <a class="res-link" href="https://huggingface.co" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="design" data-type="reference" data-title="Coolors — Color Conjurer" data-url="https://coolors.co" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🎭</div>
+        <div class="res-title">Coolors — Color Conjurer</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">Summon harmonious color palettes with the tap of a space bar. Export in any format, lock colors to preserve your favorites, and browse thousands of community palettes.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#color</span><span class="res-tag">#palette</span><span class="res-tag">#design</span></div>
+        <a class="res-link" href="https://coolors.co" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="development" data-type="tool" data-title="VS Code — The Dark Editor" data-url="https://code.visualstudio.com" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">⚡</div>
+        <div class="res-title">VS Code — The Dark Editor</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">Microsoft's open-source code editor that claimed the throne. Extensible, swift, and deeply customizable. The favored instrument of millions who craft in code.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#editor</span><span class="res-tag">#ide</span><span class="res-tag">#code</span></div>
+        <a class="res-link" href="https://code.visualstudio.com" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="learning" data-type="tutorial" data-title="freeCodeCamp — The Free Path" data-url="https://freecodecamp.org" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">🔥</div>
+        <div class="res-title">freeCodeCamp</div>
+        <span class="res-badge new">New</span>
+      </div>
+      <p class="res-desc">Thousands of hours of free coding curricula: algorithms, data structures, APIs, machine learning — all with certifications that hold genuine weight in the mortal realm.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#coding</span><span class="res-tag">#certification</span><span class="res-tag">#free</span></div>
+        <a class="res-link" href="https://freecodecamp.org" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+    <div class="res-card" data-cat="productivity" data-type="tool" data-title="Notion — The Everything Tome" data-url="https://notion.so" onclick="openModal(this)">
+      <div class="res-header">
+        <div class="res-icon-wrap">📋</div>
+        <div class="res-title">Notion — The Everything Tome</div>
+        <span class="res-badge free">Free</span>
+      </div>
+      <p class="res-desc">Wikis, databases, task managers, and documents all bound in one. Build your own personal command center or team knowledge base with unholy flexibility.</p>
+      <div class="res-footer">
+        <div class="res-tags"><span class="res-tag">#notes</span><span class="res-tag">#workspace</span><span class="res-tag">#database</span></div>
+        <a class="res-link" href="https://notion.so" target="_blank" rel="noopener" onclick="event.stopPropagation()">Visit →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter-section">
+    <p class="section-eyebrow">The Crimson Dispatch</p>
+    <h3>Enter the Inner Circle</h3>
+    <p>Receive the finest curated resources, freshly unearthed from the darkest corners of the web, delivered to your chamber each fortnight.</p>
+    <div class="newsletter-form">
+      <input type="email" placeholder="Your blood oath email…">
+      <button>Swear the Oath</button>
+    </div>
+  </div>
+
+</div><!-- end main-wrapper -->
+
+<!-- ─── FOOTER ─── -->
+<footer id="about">
+  <div class="footer-inner">
+    <div class="footer-brand-col">
+      <p class="footer-brand">⚔ The Crimson Vault</p>
+      <p class="footer-tagline">"Knowledge is the sharpest blade; may yours never dull."</p>
+    </div>
+    <div>
+      <p class="footer-col-title">Resources</p>
+      <ul class="footer-links">
+        <li><a href="#">Design Tools</a></li>
+        <li><a href="#">Development</a></li>
+        <li><a href="#">AI & Machine Learning</a></li>
+        <li><a href="#">Security</a></li>
+        <li><a href="#">Productivity</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Learn</p>
+      <ul class="footer-links">
+        <li><a href="#">Tutorials</a></li>
+        <li><a href="#">Guides</a></li>
+        <li><a href="#">Courses</a></li>
+        <li><a href="#">Books</a></li>
+        <li><a href="#">Podcasts</a></li>
+      </ul>
+    </div>
+    <div>
+      <p class="footer-col-title">Community</p>
+      <ul class="footer-links">
+        <li><a href="#">Discord</a></li>
+        <li><a href="#">Newsletter</a></li>
+        <li><a href="#">Submit Resource</a></li>
+        <li><a href="#">About</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 The Crimson Vault — All rights preserved in darkness.</p>
+    <p>Crafted with obsidian ink ✦ No tracking ✦ No compromise</p>
+  </div>
+</footer>
+
+<!-- ─── MODAL ─── -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" id="modalBox">
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    <h3 id="modalTitle">Resource Title</h3>
+    <div class="modal-meta" id="modalMeta"></div>
+    <p id="modalDesc">Description here.</p>
+    <div class="modal-actions">
+      <a href="#" class="btn-crimson" id="modalVisit">Visit Resource</a>
+      <a href="#" class="btn-ghost">Save to Grimoire</a>
+    </div>
+  </div>
+</div>
+
+<!-- ─── BACK TO TOP ─── -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+/* THEME TOGGLE */
+function toggleTheme(){
+  const html = document.documentElement;
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('themeIcon').textContent = isDark ? '🌙' : '☀';
+  document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
+}
+
+/* CATEGORY FILTER */
+let activeCategory = 'all';
+function filterByCategory(cat, el){
+  activeCategory = cat;
+  document.querySelectorAll('.cat-card').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterResources();
+}
+
+/* TAG FILTER */
+let activeTag = 'all';
+function toggleTag(el, tag){
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  activeTag = tag;
+  filterResources();
+}
+
+/* FILTER RESOURCES */
+function filterResources(){
+  const q = document.getElementById('searchInput').value.toLowerCase().trim();
+  document.querySelectorAll('.res-card').forEach(card => {
+    const cat = card.dataset.cat;
+    const type = card.dataset.type;
+    const title = card.dataset.title.toLowerCase();
+    const text = card.textContent.toLowerCase();
+    const catOk = activeCategory === 'all' || cat === activeCategory;
+    const tagOk = activeTag === 'all' || type === activeTag
+      || (activeTag === 'free' && card.querySelector('.res-badge.free'))
+      || (activeTag === 'paid' && card.querySelector('.res-badge.paid'))
+      || (activeTag === 'new' && card.querySelector('.res-badge.new'));
+    const searchOk = q === '' || text.includes(q);
+    card.classList.toggle('hidden', !(catOk && tagOk && searchOk));
+  });
+}
+
+/* MODAL */
+function openModal(card){
+  const title = card.querySelector('.res-title').textContent;
+  const desc = card.querySelector('.res-desc').textContent;
+  const url = card.dataset.url || '#';
+  document.getElementById('modalTitle').textContent = title;
+  document.getElementById('modalDesc').textContent = desc;
+  document.getElementById('modalVisit').href = url;
+  const meta = document.getElementById('modalMeta');
+  meta.innerHTML = '';
+  card.querySelectorAll('.res-badge, .res-tag').forEach(b => {
+    const s = b.cloneNode(true); meta.appendChild(s);
+  });
+  document.getElementById('modalOverlay').classList.add('open');
+}
+function closeModal(e){
+  if(e.target === document.getElementById('modalOverlay'))
+    document.getElementById('modalOverlay').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape') document.getElementById('modalOverlay').classList.remove('open');
+});
+
+/* BACK TO TOP */
+window.addEventListener('scroll', () => {
+  document.getElementById('backTop').classList.toggle('visible', window.scrollY > 400);
+});
+</script>
+</body>
+</html>
